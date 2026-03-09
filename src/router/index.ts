@@ -23,8 +23,15 @@ const routes: Array<RouteRecordRaw> = [
         path: 'emotional',
         name: 'Emotional',
         component: () => import('../views/emotional/index.vue'),
-        meta: { title: '咨询记录' }
+        meta: { title: '情绪日志' }
       },
+      {
+        path: 'message',
+        name: 'message',
+        component: () => import('../views/message/index.vue'),
+        meta: { title: '咨询记录' }
+      }
+
     ]
   },
 ]

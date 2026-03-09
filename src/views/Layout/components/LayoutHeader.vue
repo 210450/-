@@ -1,7 +1,7 @@
 <template>
   <el-header>
     <div class="header-content">
-      <el-button @click="toggleCollapse" :icon="isCollapse ? Expand : Fold" class="collapse-btn" text />
+      <el-button type="primary"  @click="toggleCollapse" :icon="isCollapse ? Expand : Fold" class="collapse-btn" text />
       <span>{{ title }}</span>
     </div>
   </el-header>
