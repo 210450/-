@@ -16,15 +16,15 @@ const searchItems = [
   {
     key: 'keyword',
     label: '关键词',
-    type: 'input',
+    type: 'input' as const,
     placeholder: '请输入关键词',
     width: '200px'
   },
   {
     key: 'dateRange',
     label: '日期范围',
-    type: 'date',
-    dateType: 'daterange',
+    type: 'date' as const,
+    dateType: 'daterange' as const,
     placeholder: '选择日期范围',
     width: '260px'
   }

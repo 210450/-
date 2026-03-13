@@ -37,11 +37,11 @@
           clearable
         />
       </div>
+    </div>
       <div class="search-actions">
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" @click="handleSearch">查询</el-button>
         <el-button @click="handleReset">重置</el-button>
       </div>
-    </div>
   </div>
 </template>
 
@@ -158,6 +158,7 @@ const handleAdd = () => {
 }
 
 .search-actions {
+  margin-top:20px;
   display: flex;
   gap: 10px;
   margin-left: auto;

@@ -19,14 +19,14 @@ const searchItems = [
   {
     key: 'userName',
     label: '用户名',
-    type: 'input',
+    type: 'input' as const,
     placeholder: '请输入用户名',
     width: '200px'
   },
   {
     key: 'type',
     label: '咨询类型',
-    type: 'select',
+    type: 'select' as const,
     placeholder: '请选择类型',
     width: '200px',
     options: [
@@ -38,7 +38,7 @@ const searchItems = [
   {
     key: 'date',
     label: '咨询日期',
-    type: 'date',
+    type: 'date' as const,
     placeholder: '选择日期',
     width: '200px'
   }
