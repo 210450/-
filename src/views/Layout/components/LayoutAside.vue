@@ -30,7 +30,7 @@ import { markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { PieChart, ChatLineSquare, Message, User } from '@element-plus/icons-vue'
 // 导入 Logo 图片
-import logo from '@/assets/image.png'
+import logo from '@/assets/images/机器人.png'
 const router = useRouter()
 // 接收父组件传递的 isCollapse 状态
 defineProps<{ isCollapse: boolean }>()
@@ -39,7 +39,7 @@ defineProps<{ isCollapse: boolean }>()
 const menuItems = [
   { index: '1', title: '数据分析', icon: markRaw(PieChart), path: '/data' },
   { index: '2', title: '知识管理', icon: markRaw(ChatLineSquare), path: '/Knowledge' },
-  { index: '3', title: '咨询记录', icon: markRaw(Message), path: '/emotional' },
+  { index: '3', title: '咨询记录', icon: markRaw(Message), path: '/message' },
   { index: '4', title: '情绪日志', icon: markRaw(User), path: '/emotional' },
 ]
 

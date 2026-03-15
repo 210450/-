@@ -19,7 +19,7 @@
   </div>
 </template>
 <script setup lang="ts">
-const authImage = new URL('@/assets/images/robot.png', import.meta.url).href
+const authImage = new URL('@/assets/images/robot-fill.png', import.meta.url).href
 </script>
 <style scoped>
 .auth-layout {

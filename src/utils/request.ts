@@ -28,6 +28,8 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response: AxiosResponse) => {
     const res = response.data
+    console.log('API 响应:', res)
+    console.log('API 响应状态码:', response.status)
     if (res.code === 200 || res.code === '200' || res.success === true) {
       return res
     } else if (res.code === -2 || res.code === '-2') {
@@ -36,11 +38,16 @@ service.interceptors.response.use(
       router.push('/auth/login')
       return Promise.reject(new Error(res.message || 'token错误'))
     } else {
-      ElMessage.error(res.message || res.msg || '请求失败')
-      return Promise.reject(new Error(res.message || res.msg || '请求失败'))
+      const errorMessage = res.message || res.msg || '请求失败'
+      console.error('API 错误:', errorMessage)
+      console.error('完整错误响应:', res)
+      ElMessage.error(errorMessage)
+      return Promise.reject(new Error(errorMessage))
     }
   },
   (error) => {
+    console.error('网络错误:', error)
+    console.error('错误响应:', error.response)
     ElMessage.error(error.message || '网络错误')
     return Promise.reject(error)
   }

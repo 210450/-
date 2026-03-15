@@ -23,6 +23,9 @@ export interface KnowledgeArticle {
   viewCount: number
   createdAt: string
   updatedAt: string
+  summary?: string
+  coverImage?: string
+  tags?: string
 }
 
 export interface KnowledgeCategoryList {
@@ -42,6 +45,13 @@ export interface KnowledgeArticleList {
   }
 }
 
+export interface KnowledgeArticleResponse {
+  code: number | string
+  message?: string
+  msg?: string
+  data: KnowledgeArticle
+}
+
 export const knowledgeApi = {
   // 获取知识分类选择器
   getCategoryList() {
@@ -50,8 +60,8 @@ export const knowledgeApi = {
   
   // 获取知识文章列表（带分页）
   getKnowledgeList(params: {
-    page?: number
-    pageSize?: number
+    current?: number
+    size?: number
     title?: string
     categoryId?: number
     status?: number
@@ -64,16 +74,7 @@ export const knowledgeApi = {
     return request.get<KnowledgeCategory>(`/knowledge/category/${id}`)
   },
   
-  // 创建知识分类
-  createCategory(data: {
-    categoryName: string
-    description: string
-    sortOrder?: number
-    status?: number
-  }) {
-    return request.post<KnowledgeCategory>('/knowledge/category', data)
-  },
-  
+
   // 更新知识分类
   updateCategory(id: number, data: {
     categoryName?: string
@@ -87,5 +88,36 @@ export const knowledgeApi = {
   // 删除知识分类
   deleteCategory(id: number) {
     return request.delete<{ code: number; msg: string }>(`/knowledge/category/${id}`)
+  },
+  
+  // 创建知识文章
+  createArticle(data: {
+    title: string
+    categoryId: number
+    summary: string
+    tags: string
+    coverImage: string
+    content: string
+    id: string
+  }) {
+    return request.post<KnowledgeArticleResponse>('/knowledge/article', data)
+  },
+  
+  // 更新知识文章
+  updateArticle(id: string, data: {
+    title: string
+    categoryId: number
+    summary: string
+    tags: string
+    coverImage: string
+    content: string
+    id: string
+  }) {
+    return request.put<KnowledgeArticleResponse>(`/knowledge/article/${id}`, data)
+  },
+
+  // 删除知识文章
+  deleteArticle(id: string) {
+    return request.delete<{ code: number; msg: string }>(`/knowledge/article/${id}`)
   }
 }
