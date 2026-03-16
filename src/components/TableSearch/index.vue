@@ -1,8 +1,11 @@
 <template>
   <div class="table-search">
-    <div class="search-header">
-      <h2>{{ title }}</h2>
-      <el-button v-if="showAddBtn" type="primary" @click="handleAdd">{{ addBtnText }}</el-button>
+    <div v-if="title || showAddBtn || hasActionsSlot" class="search-header">
+      <h2 v-if="title">{{ title }}</h2>
+      <div class="header-actions">
+        <slot name="actions" />
+        <el-button v-if="showAddBtn && !hasActionsSlot" type="primary" @click="handleAdd">{{ addBtnText }}</el-button>
+      </div>
     </div>
     <div class="search-form">
       <div class="search-item" v-for="item in searchItems" :key="item.key">
@@ -46,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { reactive, watch, useSlots } from 'vue'
 
 interface SelectOption {
   label: string
@@ -84,6 +87,9 @@ const emit = defineEmits<{
   (e: 'add'): void
   (e: 'update:modelValue', data: Record<string, any>): void
 }>()
+
+const slots = useSlots()
+const hasActionsSlot = Boolean(slots.actions)
 
 const searchData = reactive<Record<string, any>>({})
 
@@ -138,6 +144,12 @@ const handleAdd = () => {
   margin: 0;
 }
 
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .search-form {
   display: flex;
   flex-wrap: wrap;
@@ -161,6 +173,5 @@ const handleAdd = () => {
   margin-top:20px;
   display: flex;
   gap: 10px;
-  margin-left: auto;
 }
 </style>

@@ -235,7 +235,7 @@ watch(() => props.article, (newArticle) => {
     articleForm.summary = newArticle.summary || ''
     articleForm.tags = newArticle.tags ? newArticle.tags.split(',') : [] // 转换为数组
     articleForm.coverImage = newArticle.coverImage || ''
-    articleForm.content = newArticle.content
+    articleForm.content = newArticle.content || ''
     articleForm.status = newArticle.status
   } else {
     // 新增模式，清空表单
@@ -311,6 +311,7 @@ const handleSubmit = async () => {
         tags: articleForm.tags.join(','), // 转换为逗号分隔的字符串
         coverImage: articleForm.coverImage,
         content: articleForm.content,
+        status: articleForm.status,
         id: articleForm.id // 确保传递 id
       }
       

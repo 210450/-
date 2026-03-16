@@ -1,7 +1,5 @@
 <template>
   <div class="message">
-    <h2 class="title">咨询记录</h2>
-    
     <div class="message-list">
       <el-table :data="messageList">
         <el-table-column width="60">
@@ -34,15 +32,26 @@
         @current-change="loadMessageList"
       />
     </div>
+
+    <!-- 会话详情对话框 -->
+    <SessionDetail
+      v-model:visible="detailVisible"
+      :session-id="currentSessionId"
+      :session-info="currentSession"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { request } from '@/utils/request'
+import SessionDetail from './components/SessionDetail.vue'
 
 const messageList = ref([])
 const pagination = ref({ currentPage: 1, total: 0 })
+const detailVisible = ref(false)
+const currentSessionId = ref('')
+const currentSession = ref({})
 
 const loadMessageList = async () => {
   try {
@@ -66,7 +75,15 @@ const getAvatarUrl = (nickname: string) => {
 }
 
 const handleView = (row: any) => {
-  console.log('查看详情:', row)
+  // 先关闭对话框，确保重新触发加载
+  detailVisible.value = false
+  
+  // 延迟打开，确保组件状态更新
+  setTimeout(() => {
+    currentSessionId.value = row.id.toString()
+    currentSession.value = row
+    detailVisible.value = true
+  }, 50)
 }
 
 onMounted(loadMessageList)
@@ -77,13 +94,6 @@ onMounted(loadMessageList)
   padding: 20px;
   background-color: #f0f2f5;
   min-height: 100%;
-}
-
-.title {
-  margin: 0 0 20px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #304156;
 }
 
 .message-list {

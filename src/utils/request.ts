@@ -28,26 +28,28 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response: AxiosResponse) => {
     const res = response.data
-    console.log('API 响应:', res)
-    console.log('API 响应状态码:', response.status)
-    if (res.code === 200 || res.code === '200' || res.success === true) {
+    const success =
+      res?.success === true ||
+      res?.code === 200 ||
+      res?.code === '200' ||
+      res?.code === 0 ||
+      res?.code === '0'
+    if (success) {
       return res
-    } else if (res.code === -2 || res.code === '-2') {
+    } else if (res.code === -2) {
       ElMessage.error('登录已过期，请重新登录')
       localStorage.removeItem('token')
       router.push('/auth/login')
       return Promise.reject(new Error(res.message || 'token错误'))
     } else {
-      const errorMessage = res.message || res.msg || '请求失败'
-      console.error('API 错误:', errorMessage)
-      console.error('完整错误响应:', res)
-      ElMessage.error(errorMessage)
-      return Promise.reject(new Error(errorMessage))
+      ElMessage.error(res.message || '请求失败')
+      return Promise.reject(new Error(res.message || '请求失败'))
     }
   },
+//  当 HTTP 状态码异常或网络不通时触发。
+//  显示错误消息（优先使用 error.message，否则默认“网络错误”）。
+//  将错误对象继续 rejected 传递，方便调用方进一步处理。
   (error) => {
-    console.error('网络错误:', error)
-    console.error('错误响应:', error.response)
     ElMessage.error(error.message || '网络错误')
     return Promise.reject(error)
   }

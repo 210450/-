@@ -13,14 +13,19 @@ export interface KnowledgeCategory {
 }
 
 export interface KnowledgeArticle {
-  id: number
+  id: string
   title: string
   categoryId: number
   categoryName: string
-  content: string
+  content?: string
   status: number
   statusText: string
-  viewCount: number
+  authorName?: string
+  readCount?: number
+  publishedAt?: string
+  viewCount?: number
+  favoriteCount?: number
+  isFavorited?: boolean
   createdAt: string
   updatedAt: string
   summary?: string
@@ -68,6 +73,10 @@ export const knowledgeApi = {
   }) {
     return request.get<KnowledgeArticleList>('/knowledge/article/page', params)
   },
+
+  getArticleDetail(id: string) {
+    return request.get<KnowledgeArticleResponse>(`/knowledge/article/${id}`)
+  },
   
   // 获取单个知识分类详情
   getCategoryDetail(id: number) {
@@ -99,6 +108,7 @@ export const knowledgeApi = {
     coverImage: string
     content: string
     id: string
+    status?: number
   }) {
     return request.post<KnowledgeArticleResponse>('/knowledge/article', data)
   },
@@ -112,6 +122,7 @@ export const knowledgeApi = {
     coverImage: string
     content: string
     id: string
+    status?: number
   }) {
     return request.put<KnowledgeArticleResponse>(`/knowledge/article/${id}`, data)
   },

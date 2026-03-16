@@ -3,7 +3,7 @@
     <div class="header-inner">
       <div class="header-content">
         <el-button type="primary" @click="toggleCollapse" :icon="isCollapse ? Expand : Fold" class="collapse-btn" text />
-        <span>导航栏</span>
+        <span>{{ title }}</span>
       </div>
       <div class="header-actions">
         <el-dropdown @command="handleCommand">
@@ -27,10 +27,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import {  useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ArrowDown, Fold, Expand, UserFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
+const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
@@ -44,7 +45,9 @@ const toggleCollapse = () => {
   emit('toggle-collapse')
 }
 
-
+const title = computed(() => {
+  return (route.meta.title as string) || '心理健康 AI 助手'
+})
 
 const isLogin = computed(() => userStore.isLogin)
 
