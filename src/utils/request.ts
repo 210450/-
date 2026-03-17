@@ -2,6 +2,8 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
+import { getActivePinia } from 'pinia'
+import { useUserStore } from '@/stores/user'
 
 const service: AxiosInstance = axios.create({
   baseURL: '/api',
@@ -10,6 +12,24 @@ const service: AxiosInstance = axios.create({
     'Content-Type': 'application/json'
   }
 })
+
+const toLogin = () => {
+  const current = router.currentRoute.value.fullPath
+  localStorage.removeItem('token')
+  try {
+    if (getActivePinia()) {
+      const userStore = useUserStore()
+      userStore.setToken('')
+      userStore.userInfo = null
+    }
+  } catch {
+  }
+  if (current && !current.startsWith('/auth')) {
+    router.replace({ path: '/auth/login', query: { redirect: current } })
+  } else {
+    router.replace('/auth/login')
+  }
+}
 
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -38,19 +58,21 @@ service.interceptors.response.use(
       return res
     } else if (res.code === -2) {
       ElMessage.error('登录已过期，请重新登录')
-      localStorage.removeItem('token')
-      router.push('/auth/login')
+      toLogin()
       return Promise.reject(new Error(res.message || 'token错误'))
     } else {
       ElMessage.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message || '请求失败'))
     }
   },
-//  当 HTTP 状态码异常或网络不通时触发。
-//  显示错误消息（优先使用 error.message，否则默认“网络错误”）。
-//  将错误对象继续 rejected 传递，方便调用方进一步处理。
   (error) => {
-    ElMessage.error(error.message || '网络错误')
+    const status = error?.response?.status
+    if (status === 401 || status === 403) {
+      ElMessage.error('登录已过期，请重新登录')
+      toLogin()
+      return Promise.reject(error)
+    }
+    ElMessage.error(error?.message || '网络错误')
     return Promise.reject(error)
   }
 )

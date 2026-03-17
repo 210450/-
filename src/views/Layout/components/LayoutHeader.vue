@@ -29,6 +29,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowDown, Fold, Expand, UserFilled } from '@element-plus/icons-vue'
+import { ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
@@ -56,9 +57,13 @@ const displayName = computed(() => {
   return userStore.userInfo?.username || userStore.userInfo?.nickname || userStore.userInfo?.email || '用户'
 })
 
-const handleCommand = (command: string) => {
+const handleCommand = async (command: string) => {
   if (command === 'logout') {
-    userStore.logout()
+    try {
+      await ElMessageBox.confirm('确认退出登录吗？', '提示', { type: 'warning' })
+      userStore.logout()
+    } catch {
+    }
     return
   }
   if (command === 'login') {

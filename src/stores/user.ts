@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 import { authApi } from '@/api/auth'
 import router from '@/router'
 
@@ -10,61 +11,64 @@ export type UserInfo = {
   avatar?: string
 }
 
-export const useUserStore = defineStore('user', {
-  state: () => ({
-    token: localStorage.getItem('token') || '',
-    userInfo: null as UserInfo | null,
-  }),
-  
-  getters: {
-    isLogin: (state) => Boolean(state.token),
-  },
-  
-  actions: {
-    // 设置 token
-    setToken(token: string) {
-      this.token = token
-      if (token) {
-        localStorage.setItem('token', token)
-      } else {
-        localStorage.removeItem('token')
-      }
-    },
-    
-    // 登录
-    async login(params: { account: string; password: string }) {
-      const loginParams = {
-        username: params.account,
-        password: params.password
-      }
-      const res: any = await authApi.login(loginParams)
-      const token = res?.data?.token
-      if (!token) {
-        throw new Error(res?.message || '登录失败')
-      }
-      this.setToken(token)
-      const userInfo = res?.data?.userInfo
-      if (userInfo) {
-        this.userInfo = userInfo
-      } else {
-        this.userInfo = { username: params.account, nickname: params.account }
-      }
-      return res
-    },
+export const useUserStore = defineStore('user', () => {
+  const token = ref<string>(localStorage.getItem('token') || '')
+  const userInfo = ref<UserInfo | null>(null)
+  const isLogin = computed(() => Boolean(token.value))
 
-    async getCode(params: Record<string, any>) {
-      return await authApi.getCode(params)
-    },
-
-    async authentication(params: Record<string, any>) {
-      return await authApi.authentication(params)
-    },
-    
-    // 退出登录
-    logout() {
-      this.setToken('')
-      this.userInfo = null
-      router.push('/auth/login')
+  const setToken = (t: string) => {
+    token.value = t
+    if (t) {
+      localStorage.setItem('token', t)
+    } else {
+      localStorage.removeItem('token')
     }
+  }
+
+  const login = async (params: { account: string; password: string }) => {
+    const loginParams = {
+      username: params.account,
+      password: params.password,
+    }
+    const res: any = await authApi.login(loginParams)
+    const tk = res?.data?.token
+    if (!tk) {
+      throw new Error(res?.message || '登录失败')
+    }
+    setToken(tk)
+    const ui = res?.data?.userInfo
+    if (ui) {
+      userInfo.value = ui
+    } else {
+      userInfo.value = { username: params.account, nickname: params.account }
+    }
+    return res
+  }
+
+  const getCode = async (params: Record<string, any>) => {
+    return await authApi.getCode(params)
+  }
+
+  const authentication = async (params: Record<string, any>) => {
+    return await authApi.authentication(params)
+  }
+
+  const logout = (redirect?: string) => {
+    setToken('')
+    userInfo.value = null
+    const current = router.currentRoute.value.fullPath
+    const finalRedirect = redirect ?? (current.startsWith('/auth') ? '' : current)
+    router.replace(finalRedirect ? { path: '/auth/login', query: { redirect: finalRedirect } } : '/auth/login')
+  }
+
+  return {
+    token,
+    userInfo,
+    isLogin,
+    setToken,
+    login,
+    getCode,
+    authentication,
+    logout,
   }
 })
