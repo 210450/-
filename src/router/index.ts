@@ -4,40 +4,65 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'Layout',
-    component: () => import('../views/Layout/index.vue'),
+    name: 'UserLayout',
+    component: () => import('../views/UserLayout/index.vue'),
     children: [
       {
         path: '',
-        name: 'Home',
-        component: () => import('../views/data/index.vue'),
+        name: 'UserHome',
+        component: () => import('../views/UserHome/index.vue'),
         meta: { title: '首页' }
       },
       {
+        path: 'consult',
+        name: 'UserConsult',
+        component: () => import('../views/UserConsult/index.vue'),
+        meta: { title: 'AI咨询' }
+      },
+      {
+        path: 'diary',
+        name: 'UserDiary',
+        component: () => import('../views/UserDiary/index.vue'),
+        meta: { title: '情绪日记' }
+      },
+      {
+        path: 'knowledge',
+        name: 'UserKnowledge',
+        component: () => import('../views/UserKnowledge/index.vue'),
+        meta: { title: '知识库' }
+      },
+    ]
+  },
+  {
+    path: '/admin',
+    name: 'AdminLayout',
+    component: () => import('../views/Layout/index.vue'),
+    redirect: '/admin/data',
+    children: [
+      {
         path: 'data',
-        name: 'Data',
+        name: 'AdminData',
         component: () => import('../views/data/index.vue'),
         meta: { title: '数据分析' }
       },
       {
-        path: 'Knowledge',
-        name: 'Knowledge',
+        path: 'knowledge',
+        name: 'AdminKnowledge',
         component: () => import('../views/Knowledge/index.vue'),
         meta: { title: '知识管理' }
       },
       {
         path: 'emotional',
-        name: 'Emotional',
+        name: 'AdminEmotional',
         component: () => import('../views/emotional/index.vue'),
         meta: { title: '情绪日志' }
       },
       {
         path: 'message',
-        name: 'message',
+        name: 'AdminMessage',
         component: () => import('../views/message/index.vue'),
         meta: { title: '咨询记录' }
       }
-
     ]
   },
   {
@@ -67,12 +92,31 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const token = localStorage.getItem('token') || ''
-  if (to.path === '/') return true
   if (to.path.startsWith('/auth')) {
-    if (token && to.path !== '/auth/login') return { path: '/data' }
+    if (token && to.path !== '/auth/login') {
+      const loginMode = localStorage.getItem('loginMode') || 'user'
+      return { path: loginMode === 'admin' ? '/admin/data' : '/' }
+    }
     return true
   }
-  if (!token) return { path: '/auth/login', query: { redirect: to.fullPath } }
+  if (to.path === '/consult' || to.path === '/diary') {
+    if (!token) return { path: '/auth/login', query: { redirect: to.fullPath, mode: 'user' } }
+  }
+  if (to.path.startsWith('/admin')) {
+    if (!token) return { path: '/auth/login', query: { redirect: to.fullPath, mode: 'admin' } }
+    const loginMode = localStorage.getItem('loginMode') || 'user'
+    if (loginMode !== 'admin') return { path: '/' }
+    const rawUserInfo = localStorage.getItem('userInfo') || ''
+    if (rawUserInfo) {
+      try {
+        const info = JSON.parse(rawUserInfo) as { userType?: number }
+        if (info.userType !== 2) return { path: '/' }
+      } catch {
+      }
+    } else {
+      return { path: '/' }
+    }
+  }
   return true
 })
 

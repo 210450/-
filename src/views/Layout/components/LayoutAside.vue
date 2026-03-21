@@ -37,10 +37,10 @@ defineProps<{ isCollapse: boolean }>()
 
 // 菜单项配置
 const menuItems = [
-  { index: '1', title: '数据分析', icon: markRaw(PieChart), path: '/data' },
-  { index: '2', title: '知识管理', icon: markRaw(ChatLineSquare), path: '/Knowledge' },
-  { index: '3', title: '咨询记录', icon: markRaw(Message), path: '/message' },
-  { index: '4', title: '情绪日志', icon: markRaw(User), path: '/emotional' },
+  { index: '1', title: '数据分析', icon: markRaw(PieChart), path: '/admin/data' },
+  { index: '2', title: '知识管理', icon: markRaw(ChatLineSquare), path: '/admin/knowledge' },
+  { index: '3', title: '咨询记录', icon: markRaw(Message), path: '/admin/message' },
+  { index: '4', title: '情绪日志', icon: markRaw(User), path: '/admin/emotional' },
 ]
 
 // 定义一个自定义事件，用于通知父组件切换状态

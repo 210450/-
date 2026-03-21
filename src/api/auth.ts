@@ -11,6 +11,7 @@ export type UserInfo = {
   username?: string
   email?: string
   avatar?: string
+  userType?: number
 }
 
 export type LoginParams = Record<string, any>
@@ -20,9 +21,23 @@ export type LoginResult = ApiResponse<{
   userInfo?: UserInfo
 }>
 
+export type RegisterParams = {
+  username: string
+  email: string
+  nickname?: string
+  phone?: string
+  password: string
+  confirmPassword: string
+  gender: number
+  userType: number
+}
+
 export const authApi = {
   login(params: LoginParams) {
     return request.post<LoginResult>('/user/login', params)
+  },
+  register(params: RegisterParams) {
+    return request.post<ApiResponse<any>>('/user/add', params)
   },
   getCode(params: Record<string, any>) {
     return request.get<ApiResponse<any>>('/get/code', params)

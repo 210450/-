@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '@/api/auth'
 import router from '@/router'
+import type { RegisterParams } from '@/api/auth'
 
 export type UserInfo = {
   id?: number
@@ -9,12 +10,33 @@ export type UserInfo = {
   nickname?: string
   email?: string
   avatar?: string
+  userType?: number
 }
 
 export const useUserStore = defineStore('user', () => {
+  const loadUserInfo = () => {
+    const raw = localStorage.getItem('userInfo')
+    if (!raw) return null
+    try {
+      return JSON.parse(raw) as UserInfo
+    } catch {
+      localStorage.removeItem('userInfo')
+      return null
+    }
+  }
+
   const token = ref<string>(localStorage.getItem('token') || '')
-  const userInfo = ref<UserInfo | null>(null)
+  const userInfo = ref<UserInfo | null>(loadUserInfo())
   const isLogin = computed(() => Boolean(token.value))
+
+  const setUserInfo = (info: UserInfo | null) => {
+    userInfo.value = info
+    if (info) {
+      localStorage.setItem('userInfo', JSON.stringify(info))
+    } else {
+      localStorage.removeItem('userInfo')
+    }
+  }
 
   const setToken = (t: string) => {
     token.value = t
@@ -22,6 +44,7 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('token', t)
     } else {
       localStorage.removeItem('token')
+      setUserInfo(null)
     }
   }
 
@@ -38,9 +61,9 @@ export const useUserStore = defineStore('user', () => {
     setToken(tk)
     const ui = res?.data?.userInfo
     if (ui) {
-      userInfo.value = ui
+      setUserInfo(ui)
     } else {
-      userInfo.value = { username: params.account, nickname: params.account }
+      setUserInfo({ username: params.account, nickname: params.account })
     }
     return res
   }
@@ -53,9 +76,14 @@ export const useUserStore = defineStore('user', () => {
     return await authApi.authentication(params)
   }
 
+  const register = async (params: RegisterParams) => {
+    return await authApi.register(params)
+  }
+
   const logout = (redirect?: string) => {
+    localStorage.removeItem('loginMode')
     setToken('')
-    userInfo.value = null
+    setUserInfo(null)
     const current = router.currentRoute.value.fullPath
     const finalRedirect = redirect ?? (current.startsWith('/auth') ? '' : current)
     router.replace(finalRedirect ? { path: '/auth/login', query: { redirect: finalRedirect } } : '/auth/login')
@@ -66,9 +94,11 @@ export const useUserStore = defineStore('user', () => {
     userInfo,
     isLogin,
     setToken,
+    setUserInfo,
     login,
     getCode,
     authentication,
+    register,
     logout,
   }
 })

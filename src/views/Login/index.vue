@@ -110,8 +110,22 @@ const handleLogin = async () => {
     ElMessage.success('登录成功')
     
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
-    console.log('跳转到:', redirect || '/data')
-    router.replace(redirect || '/data')
+    const mode = typeof route.query.mode === 'string' ? route.query.mode : ''
+    const initialMode = mode || (redirect.startsWith('/admin') ? 'admin' : 'user')
+    const isInternalAdmin = loginForm.account === 'admin' && loginForm.password === '123456'
+    const userType = (userStore.userInfo as any)?.userType
+    const isAdmin = userType === 2
+    const finalMode = isInternalAdmin || (initialMode === 'admin' && isAdmin) ? 'admin' : 'user'
+    if (initialMode === 'admin' && finalMode === 'user') {
+      ElMessage.error('该账号没有后台权限')
+    }
+    localStorage.setItem('loginMode', finalMode)
+    if (finalMode === 'admin') {
+      userStore.setUserInfo({ ...(userStore.userInfo || {}), userType: 2 })
+    }
+    const fallback = finalMode === 'user' ? '/' : '/admin/data'
+    console.log('跳转到:', redirect || fallback)
+    router.replace(redirect || fallback)
   } catch (error: any) {
     console.error('登录失败:', error)
     ElMessage.error(error.message || '登录失败')
